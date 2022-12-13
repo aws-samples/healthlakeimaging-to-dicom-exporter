@@ -19,6 +19,8 @@ import sys
 import time
 import os
 from PIL import Image
+import gzip
+import base64 
 
 logging.basicConfig( level="INFO" )
 ThreadCount = 10
@@ -49,7 +51,7 @@ def main():
         return
     client = boto3.client('medical-imaging')
     logging.info("Reading the JSON metadata file")
-    json_dicom_header = HLIGetMetadata(datastoreId , studyId , client )
+    json_dicom_header = hliGetMetadata(datastoreId , studyId , client )
     logging.info("Parsing the Header Tags.")  
     ds = Dataset()
     vrlist = [] 
@@ -111,8 +113,10 @@ def getTags(tagLevel, ds , vrlist):
                     seqs.append(seqds)
                 datavalue = Sequence(seqs)
                 continue
-            if( tagvr == 'OB'):
-                datavalue = getOBVRTagValue(tagLevel[theKey] )
+            if( tagvr in  [ 'OB' , 'OD' , 'OF', 'OL', 'OW', 'UN' ] ):
+                base64_str = tagLevel[theKey]
+                base64_bytes = base64_str.encode('utf-8')
+                datavalue = base64.decodebytes(base64_bytes)
             data_element = DataElement(theKey , tagvr , datavalue )
             if data_element.tag.group != 2:
                 ds.add(data_element) 
@@ -122,26 +126,20 @@ def getTags(tagLevel, ds , vrlist):
     end_time = time.time()           
     logging.info(f"Dataset build   : {stopwatch(start_time,end_time)} ms") 
 
-def getOBVRTagValue(datalist):
-    bytevals = []
-    for byteval in datalist:
-        bytevals.append(int(byteval)) 
-    OBArray = bytearray(bytevals)
-    return bytes(OBArray)
-
-def HLIGetMetadata(datastoreId, studyId , client):
+def hliGetMetadata(datastoreId, studyId , client):
     start_time = time.time()
-    HLI_study_metadata = client.get_dicom_study_metadata(datastoreId=datastoreId , studyId=studyId  )
-    json_study_metadata = json.loads(HLI_study_metadata["studyMetadataBlob"].read())
-    end_time = time.time()
-    logging.info(f"Metadata fetch  : {stopwatch(start_time,end_time)} ms")        
+    hli_study_metadata = client.get_image_set_metadata(datastoreId=datastoreId , imageSetId=studyId)
+    json_study_metadata = gzip.decompress(hli_study_metadata["imageSetMetadataBlob"].read())
+    json_study_metadata = json.loads(json_study_metadata)
+    end_time = time.time()  
+    print(f"Metadata fetch : {end_time-start_time}")    
     return json_study_metadata
 
 def HLIGetFramePixels(datastoreId, studyId, imageFrameId, client):
     start_time = time.time()
     res = client.get_image_frame(
         datastoreId=datastoreId,
-        studyId=studyId,
+        imageSetId=studyId,
         imageFrameId=imageFrameId)
     end_time = time.time()
     logging.info(f"Frame fetch     : {stopwatch(start_time,end_time)} ms") 

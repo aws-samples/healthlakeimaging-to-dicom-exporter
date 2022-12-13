@@ -62,7 +62,7 @@ class HLIFrameFetcher:
     def curieGetFramePixels(self, datastoreId, studyId, imageFrameId):
         res = self.client.get_image_frame(
             datastoreId=datastoreId,
-            studyId=studyId,
+            imageSetId=studyId,
             imageFrameId=imageFrameId)
         b = io.BytesIO()
         b.write(res['imageFrameBlob'].read())

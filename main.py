@@ -26,6 +26,7 @@ from HLIDataDICOMizer import *
 import getopt, sys
 import PIL
 from PIL import Image
+import gzip
 
 
 
@@ -61,7 +62,7 @@ def main():
         logging.warning("[ServiceInit] - HLIFrameFetcher thread # "+str(x))
         HLIFrameFetcherThreadList.append(HLIFrameFetcher(str(x)))
     starttime = time.time()
-    client = boto3.client('medical-imaging')
+    client = boto3.client('medical-imaging', endpoint_url="https://iad.gamma.medical-imaging.ai.aws.dev")
     print(datastoreId)
     print(studyId)
     hli_metadata = hliGetMetadata(datastoreId,studyId,client) 
@@ -124,8 +125,9 @@ def getSeriesList(hli_metadata):
 
 def hliGetMetadata(datastoreId, studyId , client):
     start_time = time.time()
-    hli_study_metadata = client.get_dicom_study_metadata(datastoreId=datastoreId , studyId=studyId  )
-    json_study_metadata = json.loads(hli_study_metadata["studyMetadataBlob"].read())
+    hli_study_metadata = client.get_image_set_metadata(datastoreId=datastoreId , imageSetId=studyId)
+    json_study_metadata = gzip.decompress(hli_study_metadata["imageSetMetadataBlob"].read())
+    json_study_metadata = json.loads(json_study_metadata)
     end_time = time.time()  
     print(f"Metadata fetch : {end_time-start_time}")    
     return json_study_metadata

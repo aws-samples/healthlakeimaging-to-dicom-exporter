@@ -10,7 +10,7 @@ from pydicom import Dataset , DataElement
 from pydicom.dataset import FileDataset, FileMetaDataset
 from pydicom.uid import UID
 import numpy
-
+import base64
 
 
 class HLIDataDICOMizer():
@@ -76,8 +76,10 @@ class HLIDataDICOMizer():
                     datavalue=tagLevel[theKey]
                     if (int(datavalue) > 32767):
                         tagvr = 'US'
-                if( tagvr == 'OB'):
-                    datavalue = self.getOBVRTagValue(tagLevel[theKey] )
+                if( tagvr in  [ 'OB' , 'OD' , 'OF', 'OL', 'OW', 'UN' ] ):
+                    base64_str = tagLevel[theKey]
+                    base64_bytes = base64_str.encode('utf-8')
+                    datavalue = base64.decodebytes(base64_bytes)
                 if theKey == 'PrivateCreatorID': # Ignore this attribute, otherwise it creates an issue because it doesn't resolve to a DICOM tag
                     continue
                 data_element = DataElement(theKey , tagvr , datavalue )
@@ -90,11 +92,3 @@ class HLIDataDICOMizer():
             except Exception as err:
                 logging.warning(f"[HLIDataDICOMizer][getTags] - {err}")
                 continue 
-
-
-    def getOBVRTagValue(self,datalist):
-        bytevals = []
-        for byteval in datalist:
-            bytevals.append(int(byteval)) 
-        OBArray = bytearray(bytevals)
-        return bytes(OBArray)
