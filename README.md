@@ -5,16 +5,13 @@ This is a python 3.8+ sample application demonstrating how to rebuild DICOM P10 
 
 ## Getting started
 
-This sample relies on the pylibjpeg-openjpeg wrapper project, and requires a specific version of the openJpeg that supports HTJ2K. Refer to the installation steps below for more information about compiling this python package.
-
+This sample relies on the pylibjpeg-openjpeg wrapper project, and requires a specific version of openJpeg that supports HTJ2K. This is included from pylibjpeg-openjpeg v1.3.0 and above.
 
 ## Installation
 
 Follow these main steps to build and use this project:
 *  Clone this project.
-*  Clone the project pylibjpeg-openjpeg, branch jmsmkn.
 *  Initialize an app env.
-*  Compile and install pylibjpeg-openjpeg in the app env.
 *  Configure the AWS CLI for `medical-imaging` API.
 
 
@@ -22,12 +19,6 @@ Follow these main steps to build and use this project:
 This project can be cloned with the below command:
 ```
     git clone https://github.com/aws-samples/healthlakeimaging-to-dicom-exporter.git
-```
-
-### Clone the project pylibjpeg-openjpeg, branch jmsmkn
-This project needs to be cloned with its extrnal modules:
-```
-git clone --recurse-submodules https://github.com/jmsmkn/pylibjpeg-openjpeg.git
 ```
 
 ### Initialize the healthlakeimaging-to-dicom-exporter app env
@@ -42,17 +33,6 @@ Note: When the source command is successful your terminal prompt will be prefixe
 `
 (.venv) jpleger@SEA-1801104145:~/Code/healthlakeimaging-to-dicom-exporter$
 `
-
-### Compile and install pylibjpeg-openjpeg in the app env
-With the .venv env activated, locate your terminal session in the `pylibjpeg-openjpeg` folder and run the following command:
-```
-    python ./setup.py install
-```
-When this command is successful the terminal prompt returns the below message :\
-`Using /`[your git clone root directory]`/healthlakeimaging-to-dicom-exporter/.venv/lib/python3.8/site-packages`\
-`Finished processing dependencies for pylibjpeg-openjpeg==1.2.1`
-
-At this point all the dependencies are installed and the application is ready tobe used.
 
 ### Configure the AWS CLI for medical-imaging API
 At the moment this code sample is written HealthLake Imaging is still in public beta and the AWS CLI is not configured with its service descriptor. Because Python Boto3 library relies on the AWS service descriptors provided by the AWS CLI, we need to add HealthLake Imaging to the AWS CLI configuration. Becaue HLI ( HealthLake Imaging ) is only enabled in `us-east-1` region, make sure to also configure your AWS CLI in this region. 
