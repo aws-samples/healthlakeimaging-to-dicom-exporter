@@ -62,7 +62,7 @@ def main():
         logging.warning("[ServiceInit] - HLIFrameFetcher thread # "+str(x))
         HLIFrameFetcherThreadList.append(HLIFrameFetcher(str(x)))
     starttime = time.time()
-    client = boto3.client('medical-imaging', endpoint_url="https://iad.gamma.medical-imaging.ai.aws.dev")
+    client = boto3.client('medical-imaging')
     print(datastoreId)
     print(studyId)
     hli_metadata = hliGetMetadata(datastoreId,studyId,client) 
