@@ -9,7 +9,6 @@ from pydicom.sequence import Sequence
 from pydicom import Dataset , DataElement 
 from pydicom.dataset import FileDataset, FileMetaDataset
 from pydicom.uid import UID
-import numpy
 import base64
 
 

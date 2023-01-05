@@ -1,5 +1,5 @@
 """
-HLI-toDICOM application entrypoint. Contains the business logic to iterate through all the instances of the DICOM study to be exported.
+HLI-to-DICOM application entrypoint. Contains the business logic to iterate through all the instances of the DICOM study to be exported.
 
 SPDX-License-Identifier: MIT-0
 """
@@ -62,7 +62,7 @@ def main():
         logging.warning("[ServiceInit] - HLIFrameFetcher thread # "+str(x))
         HLIFrameFetcherThreadList.append(HLIFrameFetcher(str(x)))
     starttime = time.time()
-    client = boto3.client('medical-imaging', endpoint_url="https://iad.gamma.medical-imaging.ai.aws.dev")
+    client = boto3.client('medical-imaging')
     print(datastoreId)
     print(studyId)
     hli_metadata = hliGetMetadata(datastoreId,studyId,client) 
