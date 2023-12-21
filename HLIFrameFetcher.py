@@ -29,16 +29,16 @@ class HLIFrameFetcher:
         self.InstanceId = InstanceId
         self.FetchJobs = collections.deque([])
         self.FetchJobsCompleted = collections.deque([])
-        self.client = boto3.client('medical-imaging')  
+        self.client = boto3.client('medical-imaging')
         thread = Thread(target = self.ProcessJobs)
         thread.start()
 
-   
+
     def AddFetchJob(self,FetchJob):
             self.FetchJobs.append(FetchJob)
             logging.debug("[HLIFrameFetcher][AddFetchJob]["+self.InstanceId+"] - Fetch Job added "+str(FetchJob)+".")
 
-    def ProcessJobs(self):      
+    def ProcessJobs(self):
         while(self.thread_running):
             if(len(self.FetchJobs) > 0):
                 self.status="busy"
@@ -49,7 +49,7 @@ class HLIFrameFetcher:
                 except Exception as FetchError:
                     logging.error(f"[HLIFrameFetcher][{str(self.InstanceId)}] - {FetchError}")
             else:
-                self.status = 'idle'    
+                self.status = 'idle'
                 sleep(0.1)
 
     def getFramesFetched(self):
@@ -63,12 +63,12 @@ class HLIFrameFetcher:
         res = self.client.get_image_frame(
             datastoreId=datastoreId,
             imageSetId=studyId,
-            imageFrameId=imageFrameId)
+            imageFrameInformation={"imageFrameId": imageFrameId}
         b = io.BytesIO()
         b.write(res['imageFrameBlob'].read())
         b.seek(0)
         d = decode(b)
         return d
-    
+
     def Dispose(self):
         self.thread_running = False
